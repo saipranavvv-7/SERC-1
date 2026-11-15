@@ -1,0 +1,747 @@
+=== PAGE 10 ===
+Sensors 2025, 25, 870
+10 of 26
+However, traditional methods for adapting LLMs to specific domains, such as fine-
+tuning, come with limitations. Fine-tuning an LLM involves retraining the model on
+domain-specific data, which enables it to specialize in understanding cybersecurity lan-
+guage. While this approach enhances relevance, it is computationally intensive and requires
+frequent retraining to stay effective as new threats emerge [67,68]. Additionally, fine-tuned
+models may still struggle to incorporate the most recent threat intelligence, as their knowl-
+edge base is fixed post-training [69].
+To address these limitations, researchers have turned to Retrieval-Augmented Gener-
+ation (RAG), an approach that enhances LLMs by dynamically retrieving relevant infor-
+mation from external knowledge sources during inference. RAG combines an LLM with a
+retrieval component that pulls information from an up-to-date database or knowledge base,
+allowing the model to produce responses based on the latest available information. This
+capability makes RAG particularly well suited for SOC environments, where cybersecurity
+threats evolve rapidly, and the need for current intelligence is critical [70,71].
+In contrast to fine-tuning, RAG enables a more flexible and scalable solution for
+SOCs. RAG allows organizations to maintain an LLM’s core language capabilities while
+continuously feeding it real-time threat intelligence, without the overhead of retraining the
+model itself [71]. This integration of external data sources during inference supports SOC
+analysts by providing timely, context-rich responses, which enhances situational awareness
+and facilitates more accurate and responsive decision-making. By focusing on RAG, this
+paper seeks to address key challenges in incident response, such as alert fatigue and data
+relevance, by harnessing real-time data retrieval to produce actionable intelligence.
+Building on the foundational studies by Yao et al. [66] and Xu et al. [72], the study
+explores how RAG can be leveraged within SOC workflows to overcome the limitations
+of fine-tuned LLMs and achieve a higher degree of adaptability and efficiency. The imple-
+mentation of RAG in SOCs aims to establish a robust framework that not only improves
+detection accuracy but also enables swift, data-driven responses that are essential for
+mitigating today’s sophisticated cyberthreats.
+Tseng et al. [73] explore the integration of LLMs into SOC workflows, demonstrating
+how these models can be leveraged to enhance response accuracy and efficiency. By
+automating critical aspects of analysis and providing context-aware recommendations,
+LLMs reduce the cognitive load on analysts and accelerate decision-making during security
+incidents [53,74].
+2.9. Atomic Red Team: A Modular Framework for Adversary Simulation and Detection Validation
+In the evolving landscape of cybersecurity, adversary emulation has become a cor-
+nerstone for assessing the robustness of detection and response capabilities. The Atomic
+Red Team project, spearheaded by Red Canary, has emerged as a pivotal open-source
+framework designed to empower security teams with a library of lightweight, modular
+tests that emulate real-world adversary tactics and techniques [75].
+Atomic Red Team fills a critical gap in cybersecurity operations by providing security
+teams with a practical, accessible, and standardized approach to adversary emulation. Un-
+like traditional penetration testing, which often lacks alignment with tactical frameworks,
+Atomic Red Team tests are structured to replicate specific techniques such as privilege esca-
+lation, credential dumping, and lateral movement. This approach ensures that detection
+and response mechanisms are thoroughly tested in a controlled yet realistic manner [76].
+Security professionals can implement and execute these tests with minimal configura-
+tion, enabling continuous validation of security controls without significant operational
+disruption. Moreover, the framework’s open-source nature fosters collaboration and inno-
+
+
+=== PAGE 11 ===
+Sensors 2025, 25, 870
+11 of 26
+vation, allowing contributors to enhance their library and adapt tests to evolving threat
+landscapes [77].
+3. Methodology
+3.1. Proposed RAG Components
+The proposed RAG system integrates advanced components to facilitate efficient data
+retrieval and processing. It embeds data using the BAAI/bge-large-en-v1.5 model, a sophis-
+ticated embedding model optimized for creating high-dimensional vector representations
+of textual data. For vector storage and similarity search, it employs Qdrant, a robust vector
+database designed for managing embeddings, leveraging cosine similarity as the metric
+for identifying semantically relevant matches. The preprocessing pipeline begins with raw
+event logs in formats like JSON, which are parsed and encoded using a prompting LLM
+extractor powered by the Pixtral model. This model dynamically extracts and structures
+critical information based on predefined beneficial criteria, ensuring the extracted data
+align with retrieval objectives. The parsed information is then encoded into embeddings
+for efficient storage and retrieval within the vector database, enabling seamless integration
+of retrieval-augmented workflows in downstream applications.
+3.1.1. Qdrant Vector Database
+Among the many vector database solutions, Qdrant stands out as an open-source,
+scalable, and production-ready platform tailored for vector similarity search and hybrid
+retrieval tasks [78]. Unlike conventional search engines, Qdrant facilitates dense vector
+searches, providing a robust infrastructure for applications in semantic search, content rec-
+ommendation, and RAG systems. Its integration capabilities with popular machine learning
+frameworks make it a preferred choice for both academic and industrial applications.
+Furthermore, Qdrant’s support for Retrieval-Augmented Generation (RAG) has
+proven instrumental in augmenting large language models (LLMs) with domain-specific
+knowledge through vectorized document retrieval [79]. This integration empowers LLMs
+to generate context-aware and domain-specific responses.
+3.1.2. Embedding Model: BAAI/bge-large-en-v1.5
+The open-source embedding model BAAI/bge-large-en-v1.5 from Hugging Face was
+utilized to transform text data into vector representations. This model is optimized specifi-
+cally for English text, making it well suited for RAG and information retrieval applications
+within the cybersecurity domain. The BAAI/bge-large-en-v1.5 model offers notable advan-
+tages [70,80]:
+1.
+Efficiency and scale: the model demonstrates high efficiency in processing large
+volumes of text data while maintaining high accuracy in similarity detection. It uses
+a technique known as Matryoshka Representation Learning [81], which enables the
+model to generate embeddings in multiple dimensions (e.g., 1024, 768, 512, down to
+64 dimensions) without significant loss of accuracy.
+2.
+Performance comparison: compared to similar models such as OpenAI’s Ada [82] and
+traditional BERT-based models [83], BAAI/bge-large-en-v1.5 is optimized for faster
+responses and adaptability with large datasets. Its open-source nature also makes it
+more cost-effective than proprietary models, which is an important consideration for
+scalable cybersecurity applications.
+3.1.3. Similarity Metric: Cosine Distance
+Surrounded by various similarity measures, cosine similarity and its counterpart,
+cosine distance, have emerged as popular metrics due to their focus on the angular relation-
+
+
+=== PAGE 12 ===
+Sensors 2025, 25, 870
+12 of 26
+ship between vectors, independent of magnitude. This attribute has made cosine-based
+measures highly effective in applications such as document retrieval, text classification,
+and embedding evaluations [84,85].
+The formula for cosine similarity is mathematically expressed as:
+s = cos θ =
+A · B
+∥A∥× ∥B∥=
+∑n
+i=1 AiBi
+q
+∑n
+i=1 A2
+i ×
+q
+∑n
+i=1 B2
+i
+where
+•
+A and B are the vectors being compared;
+•
+A · B is their dot product;
+•
+∥A∥and ∥B∥are the magnitudes of the vectors.
+Cosine similarity is normalized, meaning it is independent of vector magnitude,
+making it well-suited for applications where the scale of the data varies significantly. The
+similarity score s ranges from −1 to 1, where 1 indicates perfect similarity, 0 denotes
+orthogonality (no similarity), and −1 represents completely opposite vectors [86].
+3.2. RAG Workflow
+3.2.1. Augmentation Process
+To facilitate the effective retrieval of documents relevant to cybersecurity incidents, as
+illustrated in Figure 3, three distinct collections, as detailed in Table 2, were created within
+the vector database. Each collection was specifically designed to serve a unique function
+within the RAG model, ensuring that query results were both contextually relevant and
+aligned with industry-standard frameworks.
+Figure 3. Augmentation process illustration.
+Table 2. Categories and related content.
+Category
+Content
+General knowledge
+Incident Response Guide [87–90] IRP [91]
+NIST knowledge
+CSF 2.0 [92]
+MITRE knowledge
+MITRE ATT&CK [93]
+Drawing on these authoritative sources, the integrated corpus combines an Incident
+Response Guide and Plan, the updated CSF 2.0, and the MITRE ATT&CK framework. To-
+gether, these documents provide procedural guidance for addressing breaches, strategic
+
+
+=== PAGE 13 ===
+Sensors 2025, 25, 870
+13 of 26
+oversight through the structured approach in CSF, and detailed adversarial insights from
+MITRE ATT&CK.
+By maintaining each reference in a separate, complementary collection within the vec-
+tor database, the RAG model can dynamically surface context-specific guidance, whether
+for immediate incident containment, alignment with recognized cybersecurity standards,
+or the identification of adversary tactics and techniques. Consequently, each query is
+grounded in industry-standard guidelines and real-world threat scenarios, thereby enhanc-
+ing both the relevance and reliability of the model’s output.
+1.
+General knowledge: this collection provides foundational knowledge for computer
+security incident handling, derived from sources such as security operations and
+automation response (SOAR) playbooks and general cybersecurity incident handling
+guides. It serves as a primary resource for addressing general security incident
+management needs.
+2.
+NIST knowledge: specifically structured to align with the NIST Cybersecurity Frame-
+work, it includes guidelines, policies, and standards that ensure relevance to regula-
+tory frameworks and assist in the compliance verification process.
+3.
+MITRE knowledge: designed around the MITRE ATT&CK framework, this collec-
+tion supports the retrieval of documents directly relevant to threat mitigation and
+response strategies. By mapping queries to specific MITRE tactics and techniques, this
+collection enhances the precision of actionable insights for mitigating cyberthreats. To
+ensure that the collection remains aligned with the state-of-the-art MITRE tactics and
+techniques, a dedicated service periodically checks the MITRE servers for updates and
+synchronizes the local collection in the vector database, enabling real-time adaptability
+to emerging threats and maintaining the relevance of the system.
+3.2.2. Chunking Techniques
+Based on observations, two types of documents were identified for storage in the
+database as primary references for the RAG system. For instance, guideline books contain-
+ing multiple subtopics with cross-contextual information were processed by segmenting
+them into smaller chunks using the Natural Language Toolkit (NLTK) splitter [94], ensuring
+each chunk was contextually coherent.
+In contrast, a single document encompassing a specific use case, attack context, mitiga-
+tion strategies, and response procedures could be stored as a unified index. This approach
+ensured the preservation of contextual integrity and provided a comprehensive guideline
+for effective mitigation and incident response. This approach ensured that the system could
+retrieve documents accurately and consistently with the correct contextual alignment in
+future queries.
+3.2.3. Large Language Model Configuration
+In this study, we configured the AI model parameters, as shown in Table 3, to optimize
+the model’s performance and ensure consistent recommendation accuracy. This setup was
+determined through iterative experimentation, guided by our objectives of maintaining
+model stability and achieving uniform behavior across diverse inputs.
+3.3. Wazuh Event Security Data Extraction and Refinement
+Upon detecting a vulnerability attack, Wazuh captures critical details using the rules-
+based matching method [95] and produces a security event log in JSON format [96], a
+common data exchange format that organizes data into hierarchical key-value pairs, facili-
+tating efficient storage and retrieval. While JSON’s structured and metadata-rich format
+is well suited for computational tasks, it requires transformation into a more contextually
+
+
+=== PAGE 14 ===
+Sensors 2025, 25, 870
+14 of 26
+enriched format to be effectively processed by large language models (LLMs). Conse-
+quently, aligning the structured representation of JSON into a format that preserves its
+semantic and contextual integrity is a critical preprocessing step in Retrieval-Augmented
+Generation (RAG) pipelines [97]. This transformation ensures that the data are optimized
+for downstream retrieval and reasoning tasks.
+Table 3. Configuration parameters for model generation.
+Parameter
+Value
+Temperature
+Set to 0.1, ensuring high determinism by minimizing randomness
+in the model’s predictions, favoring the most probable outputs.
+Top-k
+Configured as 50, restricting token sampling to the top 50 most likely
+candidates, reducing the likelihood of low-probability tokens.
+Top-p (Nucleus Sampling)
+Set to 0.9, allowing dynamic token selection by considering tokens
+with a cumulative probability of 90%, ensuring a balance between
+determinism and contextual diversity.
+Max Tokens
+Defined as 4096, specifying the upper limit for the total number of
+tokens in the generated output, suitable for applications requiring
+concise yet comprehensive responses.
+Wazuh generates two types of security event logs, those containing an MITRE ID and
+those without [98]. The refined process ensures that key metadata such as associated MITRE
+tactics, alert severity, compliance concerns, and detailed log descriptions are extracted and
+presented in a structured format. Such an approach enhances the accuracy and relevance
+of retrieval in RAG systems, enabling effective cybersecurity responses. By enriching the
+logs with actionable insights, the system ensures alignment with cybersecurity frameworks
+and provides critical information for threat mitigation.
+This approach ensures that all logs, regardless of their initial structure, are transformed
+into coherent and actionable entries that align with cybersecurity frameworks like MITRE
+ATT&CK. The refined outputs are subsequently used to construct prompts for large lan-
+guage models (LLMs), enabling accurate and context-aware retrieval of information for
+threat detection and mitigation.
+The diagram illustrated in Figure 4 shows a structured pipeline for transforming
+JSON-formatted input logs into determined plain text. In order to refine the data, the
+process involves several steps. First, the raw JSON event log is parsed into an encoded
+JSON format, preparing the data for subsequent handling. Next, the encoded JSON is
+embedded into a user prompt, as illustrated in Table 4. This step employs a one-shot output
+approach to ensure consistency in the format of the generated responses.
+Figure 4. Event security data extraction pipeline.
+This refined, text-based structure facilitates more efficient tokenization and compat-
+ibility with vector-based similarity searches in vector databases, enhancing the retrieval
+process within RAG systems. By translating structured JSON logs into a format optimized
+for vector-based systems, this method supports more accurate and contextually relevant
+
+
+=== PAGE 15 ===
+Sensors 2025, 25, 870
+15 of 26
+document retrieval, enabling SOC analysts to access real-time, actionable intelligence for
+enhanced threat detection and incident response.
+Table 4. One-shot prompt format.
+Prompt Format
+Extract the primary issue or problem from the following Wazuh JSON log.
+Focus on details like the alert description, severity level, associated tactics, compliance tags, and
+any specific event data that
+clarifies the problem:
+{input_event_json}
+Present the extracted issue in a concise format, describing the main problem indicated in the log.
+Expected Output Example:
+”’
+Given the JSON log provided, here’s how the response might look:
+Extracted Problem:
+Description: Wazuh agent ‘suricata-nids’ has stopped, indicating a potential disruption in NIDS
+monitoring.
+Alert Level: 3 (Medium severity)
+Associated Tactic: Defense Evasion (MITRE ID: T1562.001—Disable or Modify Tools)
+Compliance Concerns: PCI DSS (10.6.1, 10.2.6), HIPAA (164.312.b), TSC (CC7.2, CC7.3, CC6.8),
+NIST 800-53 (AU.6, AU.14, AU.5), GDPR (IV_35.7.d)
+Log Details: Full log message reads “Agent stopped: ’suricata-nids->any’,” suggesting possible
+interruption in security monitoring.
+”’
+Expected output above focuses on the core issue, making it easily readable and actionable for SOC
+and RAG systems.
+3.4. Retrieval Methodology for Security Event Log Analysis and Response
+The copilot system was designed to respond by analyzing the extracted data for the
+presence of a given MITRE ID and subsequently retrieving relevant contextual information
+directly from a server or database. This retrieval process involved querying three distinct
+sources: the MITRE ATT&CK framework, general incident response guidelines, and the NIST
+Cybersecurity Framework (CSF) collection, as detailed in Table 2. These three data sources
+played a critical role in ensuring the relevance and accuracy of the system’s output. The
+retrieved information was then consolidated and served as input for the prompt builder,
+which integrated the contextual data to construct a coherent and contextually informed
+prompt for the AI model. Leveraging this enriched context, the AI model generated a tailored
+instruction guide that was delivered to the user. This structured workflow shown in Figure 5
+ensured that the copilot system provided precise, actionable, and context-aware guidance,
+enhancing its utility in real-time incident response and decision-making scenarios.
+The SERC was further equipped with a chat response feature designed to facilitate
+follow-up interactions for specific cases related to the initial response. This feature enabled
+a dynamic and iterative communication process, allowing users to query the system for
+additional details, clarifications, or guidance tailored to the nuances of a given incident. By
+integrating conversational capabilities, the SERC enhanced its utility as a responsive and
+adaptive tool, ensuring that users received comprehensive support throughout the incident
+management lifecycle. This functionality is particularly valuable in addressing complex
+scenarios where continuous interaction is required to refine and implement effective cyber-
+security measures.
+As outlined in Table 5, the response format is utilized as an input prompt for the
+model, integrating comprehensive knowledge from general incident response guidelines,
+the NIST Cybersecurity Framework (CSF), and the MITRE framework. This approach
+facilitates the generation of contextually relevant mitigation follow-up actions tailored to
+specific security incidents.
+
+
+=== PAGE 16 ===
+Sensors 2025, 25, 870
+16 of 26
+Figure 5. Security Event Response Copilot (SERC) Workflow.
+Table 5. Security Event response prompt format
+Response Prompt Format
+This is the context information for general knowledge purposes:
+{context_general}
+This is the context information knowledge of planning for generating the incident response
+playbook based on The NIST Cybersecurity Framework (CSF) 2.0:
+{context_nist}
+This is the context information knowledge from MITRE ATT&CK for security incident response
+mitigation purposes:
+{context_mitre}
+Based on the above context information, hope you can use and elaborate on the knowledge you
+have to analyze this incident and tell me what action to take:
+json
+Based on that incident, what should be done to mitigate the risk? Make sure to use knowledge of
+the NIST CSF 2.0 and the MITRE ATT&CK
+framework to identify the tactics and techniques associated with the incident.
+Do not mention the source of JSON or text input, just tell what action to take with
+Markdown format.
+4. Experiment Results
+4.1. Copilot Integration for Security Event Analysis in Wazuh
+The custom dashboard presented in Figure 6 illustrates the implementation of a
+streamlined workflow for managing security events within the Wazuh platform. The image
+depicts several key features that enhance user interaction and event analysis. The primary
+section of the dashboard shows a detailed list of security events detected by Wazuh. A new
+tab labeled Copilot is prominently featured in the event details section. This tab serves as
+an interface for leveraging the advanced analytical capabilities of the SERC (Security Event
+Response Copilot) system.
+The results from the SERC system are rendered in real time within the Copilot tab.
+This enables users to view critical findings, such as risk assessments, recommended actions,
+or contextual insights, directly within the Wazuh interface without switching applications.
+A dynamic chat section is integrated into the Copilot, allowing users to interact with the
+system by providing additional instructions or querying specific aspects of the processed
+data. This feature enhances the decision-making process by enabling a tailored response to
+the presented insights.
+
+
+=== PAGE 17 ===
+Sensors 2025, 25, 870
+17 of 26
+Figure 6. Copilot embedded into Wazuh with custom interface.
+4.2. Simulation Scenario
+This study conducted an end-to-end simulation of attack and defense mechanisms to
+evaluate the integration of automated detection and mitigation procedures, as illustrated
+in Figure 7. The framework utilized the Atomic Red Team tool to simulate predefined
+adversarial scenarios, meticulously designed with anticipated outcomes. These scenarios
+were executed on a monitored target endpoint equipped with Wazuh agents, enabling the
+generation of relevant security events for analysis.
+Figure 7. High-level simulation workflow.
+Detected security events were processed to initiate user interaction through a copilot
+interface, providing tailored mitigation guidelines aligned with the attack types defined in
+the MITRE ATT&CK framework.
+This workflow, as illustrated in Figure 8, allows users to respond effectively by adher-
+ing to context-specific instructions. The selected attack scenarios provide precise measure-
+ments of inputs (attack actions) and outputs (detection and response), thereby enabling a
+comprehensive assessment of the system’s performance under realistic conditions.
+The experiment employed the SOCFortress Incident Response Plan [99], a repository
+renowned for its alignment with real-world threat scenarios, as a robust benchmark. Ad-
+versarial actions were simulated using the Red Atomic Attack Emulator in conjunction
+
+
+=== PAGE 18 ===
+Sensors 2025, 25, 870
+18 of 26
+with the MITRE ATT&CK framework. Security events generated during the attacks were
+collected and cataloged by the Wazuh SIEM system. This setup facilitated the evaluation
+of two prominent language models OpenAI and Pixtral for their capacity to process and
+respond effectively to simulated cyberattacks.
+Figure 8. Attack simulation scenario.
+Setting the Stage: Building the Simulation
+Our experiment focused on six distinct attack types, each carefully designed to mimic
+realistic scenarios. The categories Account Compromise, Data Loss, Malware, Phishing,
+and Ransomware were selected based on our ground truth [99], as they represent some of
+the most critical threats in modern cybersecurity. Each attack was systematically mapped
+to specific MITRE ATT&CK techniques, including “Valid Accounts” (T1078), “Data En-
+crypted for Impact” (T1486), and “Malicious File” (T1204.002). This approach ensured
+that the simulation adhered to standardized methodologies while reliably generating the
+expected security events, establishing a solid foundation for evaluating detection and
+response mechanisms.
+To achieve this, the simulation framework was designed to reliably trigger corre-
+sponding alerts in the Wazuh SIEM system, meeting the necessary conditions for detection
+and response. For example, the “Valid Accounts” technique led to successful credential
+misuse, generating authentication-related logs, while “Data Encrypted for Impact” created
+file system events indicative of ransomware activity. Similarly, “Malicious File” events
+were crafted to simulate malware execution, producing alerts that highlighted anomalous
+process behaviors and file manipulations.
+This alignment between simulated attack actions and expected security events was
+critical to validating the accuracy and completeness of the detection system. By ensuring
+that every attack type generated its intended security events, the experiment provided a
+robust foundation for evaluating how well-automated detection and response mechanisms
+could process and address these threats in real-time.
+We turned to the Red Atomic Attack Emulator, a tool capable of generating precise
+and controlled attack scenarios [100]. As the attacks unfolded, the Wazuh agent, installed
+on a targeted endpoint, captured the resulting security events. These events, flowing into
+the SIEM server, formed the heartbeat of our experiment, a stream of alerts and logs ready
+for analysis.
+
+
+=== PAGE 19 ===
+Sensors 2025, 25, 870
+19 of 26
+4.3. Performance Evaluation
+To evaluate the effectiveness of our proposed simulation framework, we undertook a
+meticulous comparison of the recommendations generated by the copilot system against
+a carefully curated ground truth [99]. The evaluation journey unfolded through the use
+of several well-established metrics, each chosen for its unique ability to assess different
+dimensions of text quality and alignment.
+Our first step was to employ cosine similarity, a measure that allowed us to quantify
+the semantic alignment between the copilot’s recommendations and the ground truth.
+By transforming the texts into vector representations and calculating their similarity, this
+method revealed how closely the generated outputs adhered to the intended meaning.
+Building upon this, we turned to BERTScore [101], which offered a deeper insight into
+contextual accuracy. Leveraging the power of transformer-based embeddings, this method
+allowed us to capture subtle nuances in meaning and determine whether the copilot’s
+responses truly reflected the intent of the ground truth. The rich contextual evaluation
+provided by BERTScore complemented the semantic perspective of cosine similarity.
+This multi-faceted evaluation approach enabled us to delve into the performance
+of the copilot system from multiple perspectives: semantic, contextual, structural, and
+recall-based. The combined insights demonstrated the system’s capability to align with
+the ground truth and highlighted areas for potential refinement, further reinforcing the
+robustness of the proposed simulation framework in replicating real-world cybersecurity
+response scenarios.
+The results shown in Figure 8 illustrate the attack flow and the corresponding scenarios,
+while the cosine similarity scores for Pixtral and OpenAI across these 12 attack scenarios
+are presented in Figure 9. OpenAI generally maintained a higher or comparable level of
+semantic alignment with the ground truth, peaking at certain scenarios (e.g., scenario 8
+with 75.81%), while exhibiting notable drops in others (e.g., scenario 6 with 46.61%). Pixtral,
+while more consistent across scenarios, tended to trail OpenAI but showed competitive
+alignment in specific scenarios, such as 9 and 10.
+Figure 9. Model performance from various attacks using cosine similarity.
+OpenAI consistently achieved higher percentages in most scenarios, peaking at 75.81%
+in scenario 8, while Pixtral exhibited steadier performance, reaching up to 71.69% in
+scenario 9
+
+
+=== PAGE 20 ===
+Sensors 2025, 25, 870
+20 of 26
+As shown in Figure 10, Pixtral consistently maintained higher precision percentages,
+ranging between 84.5% and 87.0%, with minimal fluctuations. OpenAI demonstrated more
+variability, with percentages dipping below Pixtral in several scenarios but occasionally
+achieving competitive values.
+Figure 10. Model performance from various attacks using BERTScore: precision.
+Pixtral shows in Figure 11 slightly higher recall percentages in most scenarios, ranging
+from 85.6% to 87.5%, reflecting its reliability in capturing relevant information. OpenAI,
+while competitive, displays greater variability, with recall percentages fluctuating between
+84.8% and 86.9%.
+Figure 11. Model performance from various attacks using BERTScore: recall.
+Pixtral’s F1-score percentages, as shown in Figure 12, consistently ranged between
+85.4% and 87.2%, showcasing balanced performance across scenarios, while OpenAI,
+capable of achieving comparable F1 scores in certain scenarios, exhibited more pronounced
+dips, with percentages ranging between 84.9% and 86.5%.
+
+
+=== PAGE 21 ===
+Sensors 2025, 25, 870
+21 of 26
+Figure 12. Model performance from various attacks using BERTScore: F1.
+5. Discussion and Future Work
+This study revealed distinct patterns in the performance of Pixtral and OpenAI when
+tasked with aligning generated responses to the ground truth across a variety of attack scenarios.
+Pixtral consistently demonstrated reliability, maintaining stable precision, recall, and F1 scores
+throughout the evaluation. This consistency reflects its ability to generate responses that are
+both relevant and comprehensive, making it a dependable choice in diverse contexts. However,
+while Pixtral’s steadiness is an asset, its performance plateaued in certain scenarios, limiting its
+potential to achieve the highest possible alignment with the ground truth.
+In contrast, OpenAI exhibited a broader range of performance. It achieved competitive
+scores in specific scenarios, showcasing its adaptability and potential for strong contextual
+understanding. However, its performance was more variable, with noticeable dips in
+recall and F1 scores in certain attack scenarios. This inconsistency suggests challenges in
+balancing precision and recall, which are critical for generating comprehensive and relevant
+responses in cybersecurity contexts.
+The comparison underscores the complementary strengths of the two models. Pixtral’s
+steadiness ensures dependable performance, while OpenAI’s adaptability highlights its poten-
+tial for excelling in nuanced scenarios. Yet, both models demonstrate room for improvement,
+particularly in scenarios where alignment with the ground truth proved more challenging.
+Building on these findings, future research will focus on fine-tuning Pixtral and Ope-
+nAI models using domain-specific datasets to improve contextual understanding and
+alignment with the ground truth across diverse attack scenarios. Priority will be given
+to scenario-specific training for nuanced threats such as phishing and ransomware to en-
+hance adaptability. Robustness and continuous improvement will be achieved through
+adversarial training and active learning, incorporating feedback from domain experts.
+Additionally, the simulation framework will be extended to integrate with Security Or-
+chestration, Automation, and Response (SOAR) systems, enabling end-to-end automation
+of the incident response lifecycle. This integration aims to enhance the practical utility of
+AI-driven copilots in Security Operations Center (SOC) environments, streamlining and
+improving incident management processes.
+
+
+=== PAGE 22 ===
+Sensors 2025, 25, 870
+22 of 26
+Author Contributions: Conceptualization, I.; methodology, I.; software, R.K., F.W., I.M.W., Z.A.B.
+and U.; validation, G.A.N.; formal analysis, I. and R.K.; data curation, I. and R.K.; writing-original
+draft, I.; writing—review and editing, I.; visualization, I. and I.M.W.; supervision, H.K.; project
+administration, H.K.; funding acquisition, H.K. All authors have read and agreed to the published
+version of the manuscript.
+Funding: This research was funded by the Korea government(MSIT) grant number RS-2024-00402782.
+Institutional Review Board Statement: Not applicable.
+Informed Consent Statement: Not applicable.
+Data Availability Statement: Data is contained within the article.
+Acknowledgments: This research was supported by the MSIT (Ministry of Science and ICT), Korea,
+under the ITRC (Information Technology Research Center) support program (RS-2020-II201797) super-
+vised by the IITP (Institute for Information & Communications Technology Planning & Evaluation),
+and it was also supported by the Institute of Information & Communications Technology Planning &
+Evaluation (IITP) grant funded by the Korean government (MSIT) (RS-2024-00402782, Development
+of virtual commissioning technology that interconnects manufacturing data for global expansion).
+Conflicts of Interest: The authors declare no conflicts of interest.
+References
+1.
+Closing the Talent Gap: Technological Considerations for SOC Analyst Retention. Available online: https://solutionsreview.com/
+security-information-event-management/closing-the-talent-gap-technological-considerations-for-soc-analyst-retention (ac-
+cessed on 16 December 2024).
+2.
+Homegrown SOC Automation: Pros and Cons|Enterprise Tech News EM360Tech. Available online: https://em360tech.com/
+tech-article/homegrown-soc-automation-pros-and-cons (accessed on 16 December 2024).
+3.
+Common SOC Challenges and How to Overcome Them—Sennovate. Available online: https://sennovate.com/common-soc-
+challenges-and-how-to-overcome-them/ (accessed on 16 December 2024).
+4.
+How to Train Your SOC Staff: What Works and What Doesn’t-SecurityWeek. Available online: https://www.securityweek.com/
+how-train-your-soc-staff-what-works-and-what-doesnt/ (accessed on 16 December 2024).
+5.
+Vielberth, M.; Bohm, F.; Fichtinger, I.; Pernul, G. Security Operations Center: A Systematic Study and Open Challenges. IEEE
+Access 2020, 8, 227756–227779. [CrossRef]
+6.
+To Rule or Not to Rule: SIEMs and Their False Positives|CSO Online. Available online: https://www.csoonline.com/article/56
+3285/to-rule-or-not-to-rule-siems-and-their-false-positives.html (accessed on 16 December 2024).
+7.
+Kaliyaperumal, L.N. The Evolution of Security Operations and Strategies for Building an Effective SOC. ISACA J. 2021, 5, 1–7.
+8.
+Perera, A.; Rathnayaka, S.; Perera, N.D.; Madushanka, W.W.; Senarathne, A.N. The Next Gen Security Operation Center. In
+Proceedings of the 2021 6th International Conference for Convergence in Technology, I2CT 2021, Maharashtra, India, 2–4 April
+2021; Institute of Electrical and Electronics Engineers Inc.: Piscataway, NJ, USA, 2021. [CrossRef]
+9.
+Arora, A. MITRE ATT&CK vs. NIST CSF: A Comprehensive Guide to Cybersecurity Frameworks; CloudDefense. Available online:
+https://www.clouddefense.ai/mitre-attck-vs-nist-csf/ (accessed on 15 December 2024).
+10.
+Abo El Rob, M.F.; Islam, M.A.; Gondi, S.; Mansour, O. The Application of MITRE ATT&CK Framework in Mitigating Cybersecurity
+Threats in the Public Sector. Issues Inf. Syst. 2024, 25, 62–80. [CrossRef]
+11.
+Stine, K.; Quinn, S.; Witte, G.; Gardner, R.K. Integrating Cybersecurity and Enterprise Risk Management (ERM); U.S. Department of
+Commerce, National Institute of Standards and Technology: Gaithersburg, MD, USA, 2020. [CrossRef]
+12.
+Wainwright, T. Aligning MITRE ATT&CK for Security Resilience-Security Risk Advisors; Security Risk Advisors. Available online:
+https://sra.io/blog/the-road-to-benchmarked-mitre-attck-alignment-defense-success-metrics/ (accessed on 15 December 2024).
+13.
+Freitas, S.; Kalajdjieski, J.; Gharib, A.; McCann, R. AI-Driven Guided Response for Security Operation Centers with Microsoft
+Copilot for Security. arXiv 2024, arXiv:2407.09017.
+14.
+Fysarakis, K.; Lekidis, A.; Mavroeidis, V.; Lampropoulos, K.; Lyberopoulos, G.; Vidal, I.G.M.; i Casals, J.C.T.; Luna, E.R.;
+Sancho, A.A.M.; Mavrelos, A.; et al. PHOENI2X–A European Cyber Resilience Framework With Artificial-Intelligence-Assisted
+Orchestration, Automation and Response Capabilities for Business Continuity and Recovery, Incident Response, and Information
+Exchange. In Proceedings of the 2023 IEEE International Conference on Cyber Security and Resilience (CSR), Venice, Italy,
+31 July–2 August 2023.
+
+
+=== PAGE 23 ===
+Sensors 2025, 25, 870
+23 of 26
+15.
+Cado Security. Best Open Source SOC Tools You Should Use. Available online: https://www.cadosecurity.com/wiki/best-open-
+source-soc-tools-you-should-use (accessed on 18 December 2024).
+16.
+Absoluit. Building a Powerful Open-Source Security Operations Center (SOC)-Absoluit. Available online: https://absoluit.com/
+building-a-powerful-open-source-security-operations-center-soc/ (accessed on 18 December 2024).
+17.
+Wazuh Inc. Wazuh—Open Source XDR. Open Source SIEM. Available online: https://wazuh.com/ (accessed on 18 November 2024).
+18.
+HG Insights. Companies Using Wazuh, Market Share, Customers and Competitors. Available online: https://discovery.hgdata.
+com/product/wazuh (accessed on 18 November 2024).
+19.
+Younus, Z.S.; Alanezi, M. Detect and Mitigate Cyberattacks Using SIEM. In Proceedings of the Proceedings-International
+Conference on Developments in eSystems Engineering, Istanbul, Turkiye, 18–20 December 2023; DeSE. Institute of Electrical and
+Electronics Engineers Inc.: Piscataway, NJ, USA, 2023; pp. 510–515. [CrossRef]
+20.
+OpenAI. Hello GPT-4o|OpenAI. Available online: https://openai.com/index/hello-gpt-4o/ (accessed on 22 November 2024).
+21.
+Mistral AI. Pixtral Large|Mistral AI|Frontier AI in Your Hands. Available online: https://mistral.ai/news/pixtral-large/
+(accessed on 21 November 2024).
+22.
+Wiemer, R.D.; Eurecom, M.D. Security Operations & Incident Management Knowledge Area Version. Available online: http:
+//www.nationalarchives.gov.uk/doc/open- (accessed on 18 December 2024).
+23.
+Abuneama, J.M.; Matar, M.A.I.; Abusamra, A.A. Enhancing Cybersecurity with IDS and SIEM Integration Detection. In AI
+in Business: Opportunities and Limitations: Volume 2; Khamis, R., Buallay, A., Eds.; Springer Nature: Cham, Switzerland, 2024;
+pp. 57–63. [CrossRef]
+24.
+Zeinali, S.M. Analysis of Security Information and Event Management (Siem) Evasion and Detection Method; Tallinn University of
+Technology: Tallinn, Estonia, 2016.
+25.
+Cinque, M.; Cotroneo, D.; Pecchia, A. Challenges and Directions in Security Information and Event Management (SIEM).
+In Proceedings of the 2018 IEEE International Symposium on Software Reliability Engineering Workshops (ISSREW), Memphis,
+TN, USA, 15–18 October 2018; pp. 95–99. [CrossRef]
+26.
+Gartner Peer Insights. IBM Security QRadar SIEM vs. Wazuh—The Open Source Security Platform 2024|Gartner Peer Insights.
+Available online: https://www.gartner.com/reviews/market/security-information-event-management/compare/product/
+ibm-security-qradar-siem-vs-wazuh-the-open-source-security-platform (accessed on 18 December 2024).
+27.
+SourceForge. IBM QRadar SIEM vs. Splunk Enterprise vs. Wazuh Comparison. Available online: https://sourceforge.net/
+software/compare/IBM-QRadar-SIEM-vs-Splunk-vs-Wazuh/ (accessed on 18 December 2024).
+28.
+PeerSpot. IBM Security QRadar vs. Wazuh Comparison 2024|PeerSpot. Available online: https://www.peerspot.com/products/
+comparisons/ibm-security-qradar_vs_wazuh (accessed on 18 December 2024).
+29.
+Kinney Group. Splunk vs. QRadar: A SIEM Solution Comparison—Kinney Group. Available online: https://kinneygroup.com/
+blog/splunk-vs-qradar/ (accessed on 18 December 2024).
+30.
+InfosecTrain. IBM QRadar vs. Splunk SIEM—InfosecTrain. Available online: https://www.infosectrain.com/blog/ibm-qradar-
+vs-splunk-siem/ (accessed on 18 December 2024).
+31.
+TechRepublic. QRadar vs. Splunk (2023): SIEM Tool Comparison. Available online: https://www.techrepublic.com/article/
+qradar-vs-splunk/ (accessed on 18 December 2024).
+32.
+eWeek. QRadar vs. Splunk: SIEM Tools Review|eWeek. Available online: https://www.eweek.com/security/splunk-vs-ibm-
+qradar-siem-head-to-head/ (accessed on 18 December 2024).
+33.
+Wazuh, Inc. Wazuh Documentation. Available online: https://documentation.wazuh.com/current/index.html (accessed on 18
+December 2024).
+34.
+Elastic N.V. Elastic Stack: (ELK) Elasticsearch, Kibana & Logstash|Elastic. Available online: https://www.elastic.co/elastic-stack
+(accessed on 18 December 2024).
+35.
+teTrain. Wazuh vs. Other SIEM Tools. Available online: https://www.tetrain.com/tetra-blogs/post/107/wazuh-vs-other-siem-
+tools.html (accessed on 18 December 2024).
+36.
+Šuškalo, D.; Mori´c, Z.; Redžepagi´c, J.; Regvart, D. Comparative Analysis of IBM QRadar and Wazuh for Security Information and
+Event Management. In Proceedings of the 34th DAAAM International Symposium on Intelligent Manufacturing and Automation,
+Vienna, Austria, 26–27 October 2023. [CrossRef]
+37.
+Dunsin, D.; Ghanem, M.C.; Ouazzane, K.; Vassilev, V. A Comprehensive Analysis of the Role of Artificial Intelligence and
+Machine Learning in Modern Digital Forensics and Incident Response Article info.
+Forensic Sci. Int. Digit. Investig.
+2023,
+48, 301675.
+38.
+Hays, S.; White, J. Employing LLMs for Incident Response Planning and Review. arXiv 2024, arXiv:2403.01271.
+39.
+Georgiadou, A.; Mouzakitis, S.; Askounis, D. Assessing Mitre ATT&CK Risk Using a Cyber-Security Culture Framework. Sensors
+2021, 21, 3267. [CrossRef]
+
+
+=== PAGE 24 ===
+Sensors 2025, 25, 870
+24 of 26
+40.
+ExtraHop. RevealX™and the MITRE ATT&CK® Framework: How RevealX Differentiators Fuel Breadth and Depth of MITRE
+ATT&CK Coverage. Available online: https://www.extrahop.com/resources/revealx-mitre-attack-framework/ (accessed on 13
+December 2024).
+41.
+Cybereason. MITRE ATT&CK and Building Better Defenses. Available online: https://www.cybereason.com/hubfs/White%20
+Papers/MITRE_ATT&CK_and_Building_Better_Defenses.pdf (accessed on 13 December 2024).
+42.
+Att, M. Best Practices for MITRE ATT&CK® Mapping; MITRE Corporation: Bedford, MA, USA, 2021. Available online: http:
+//www.cisa.gov/tlp/.TLP:WHITE (accessed on 13 December 2024).
+43.
+Daszczyszak, R.; Ellis, D.; Luke, S.; Whitley, S. Sponsor: USCYBERCOM TTP-Based Hunting. 2019. Dept. No.: P522; Contract
+No.: W56KGU-16-C-0010; Project No.: 0718N00A-WF. This Technical Data Deliverable Was Developed Using Contract Funds
+Under Basic Contract No. W56KGU-18-D-0004. Approved for Public Release; Distribution Unlimited. Public Release Case
+Number 19-3892. ©2020 The MITRE Corporation. All rights reserved. The MITRE Corporation: Annapolis Junction, MD, USA,
+2020. Available online: https://www.mitre.org/sites/default/files/2021-11/prs-19-3892-ttp-based-hunting.pdf (accessed on 16
+December 2024).
+44.
+Al-Sada, B.; Sadighian, A.; Oligeri, G. MITRE ATT&CK: State of the Art and Way Forward. ACM Comput. Surv. 2023, 57, 1–37.
+45.
+National Institute of Standards and Technology. Framework for Improving Critical Infrastructure Cybersecurity, Version 1.1; NIST:
+Gaithersburg, MD, USA, 2018. Available online: http://nvlpubs.nist.gov/nistpubs/CSWP/NIST.CSWP.04162018.pdf (accessed
+on 20 December 2024). [CrossRef]
+46.
+The White House. Foreign Policy Cyber Security Executive Order 13636|The White House; The White House: Washington, DC, USA,
+2013. Available online: https://obamawhitehouse.archives.gov/issues/foreign-policy/cybersecurity/eo-13636 (accessed on 20
+December 2024).
+47.
+Chio, C.; Freeman, D. Machine Learning and Security: Protecting Systems with Data and Algorithms; O’Reilly Media: Sebastopol, CA,
+USA, 2018.
+48.
+Wu, F.; Zhang, Q.; Bajaj, A.P.; Bao, T.; Zhang, N.; Wang, R.F.; Xiao, C. Exploring the Limits of ChatGPT in Software Security
+Applications. arXiv 2023, arXiv:2312.05275.
+49.
+Pordanesh, S.; Tan, B. Exploring the Efficacy of Large Language Models (GPT-4) in Binary Reverse Engineering. arXiv 2024,
+arXiv:2406.06637.
+50.
+NVIDIA. Optimizing T5 and GPT-2 for Real-Time Inference with NVIDIA TensorRT|NVIDIA Technical Blog. Available online:
+https://developer.nvidia.com/blog/optimizing-t5-and-gpt-2-for-real-time-inference-with-tensorrt (accessed on 22 December 2024).
+51.
+Kim, S.; Hooper, C.; Wattanawong, T.; Kang, M.; Yan, R.; Genc, H.; Dinh, G.; Huang, Q.; Keutzer, K.; Mahoney, M.W.; et al. Full
+Stack Optimization of Transformer Inference: A Survey. arXiv 2023, arXiv:2302.14017.
+52.
+Geeky Gadgets. How Llama-3.3 70B Stacks Up Against GPT-4 and Other AI Models—Geeky Gadgets. Available online:
+https://www.geeky-gadgets.com/llama-3-3-70b-open-source-ai-model/ (accessed on 22 December 2024).
+53.
+Ferrag, M.A.; Alwahedi, F.; Battah, A.; Cherif, B.; Mechri, A.; Tihanyi, N. Generative AI and Large Language Models for Cyber
+Security: All Insights You Need. arXiv 2024, arXiv:2405.12750.
+54.
+Aghaei, E. ehsanaghaei/SecureBERT · Hugging Face. Available online: https://huggingface.co/ehsanaghaei/SecureBERT
+(accessed on 22 December 2024).
+55.
+Aghaei, E.; Niu, X.; Shadid, W.; Al-Shaer, E. SecureBERT: A Domain-Specific Language Model for Cybersecurity. In Lecture Notes
+of the Institute for Computer Sciences, Social-Informatics and Telecommunications Engineering, LNICST; Springer: Cham, Switzerland,
+2023; Volume 462, pp. 39–56. [CrossRef]
+56.
+Geeky Gadgets. Mistral Pixtral 12B Open Source AI Vision Model Released—Geeky Gadgets. Available online: https://www.
+geeky-gadgets.com/mistral-pixtral-12b-ai-vision-model/ (accessed on 22 December 2024).
+57.
+Hu, E.J.; Shen, Y.; Wallis, P.; Allen-Zhu, Z.; Li, Y.; Wang, S.; Wang, L.; Chen, W. LoRA: Low-Rank Adaptation of Large Language
+Models. arXiv 2021, arXiv:2106.09685.
+58.
+Geeky Gadgets. Fine Tuning Mistral Pixtral 12B Multimodal AI-Geeky Gadgets. Available online: https://www.geeky-gadgets.
+com/fine-tuning-mistral-pixtral-12b-multimodal-ai/ (accessed on 22 December 2024).
+59.
+Gao, Y.; Xiong, Y.; Gao, X.; Jia, K.; Pan, J.; Bi, Y.; Dai, Y.; Sun, J.; Wang, M.; Wang, H. Retrieval-Augmented Generation for Large
+Language Models: A Survey. arXiv 2023, arXiv:2312.10997.
+60.
+NVIDIA. What is Retrieval-Augmented Generation (RAG)?|NVIDIA. Available online: https://www.nvidia.com/en-in/
+glossary/retrieval-augmented-generation/ (accessed on 16 December 2024).
+61.
+Lin, G.; Feng, T.; Han, P.; Liu, G.; You, J. Paper Copilot: A Self-Evolving and Efficient LLM System for Personalized Academic
+Assistance. arXiv 2024, arXiv:2409.04593.
+62.
+Li, R.; Patel, T.; Wang, Q.; Du, X. MLR-Copilot: Autonomous Machine Learning Research based on Large Language Models
+Agents. arXiv 2024, arXiv:2408.14033.
+
+

@@ -1,0 +1,195 @@
+{
+  "metrics_explanation": {
+    "Precision@K": "Measures what proportion of the top-K retrieved knowledge chunks are relevant to the security alert.",
+    "Recall@K": "Measures the fraction of relevant knowledge captured within the top-K retrieved results.",
+    "MRR (Mean Reciprocal Rank)": "Measures the quality of ranking by averaging 1/rank of the first relevant result across all queries.",
+    "BERTScore (P, R, F1)": "Measures semantic similarity between generated RAG analysis and gold-standard expert analyst responses using contextual embeddings."
+  },
+  "overall_results": {
+    "mean_precision_at_1": 0.6,
+    "mean_precision_at_3": 0.6,
+    "mean_precision_at_5": 0.56,
+    "mean_recall_at_1": 0.6,
+    "mean_recall_at_3": 0.6,
+    "mean_recall_at_5": 0.6,
+    "mean_reciprocal_rank": 0.6,
+    "mean_bert_score": {
+      "precision": 0.8042,
+      "recall": 0.8148,
+      "f1": 0.8095
+    }
+  },
+  "scenarios_evaluated": 5,
+  "detailed_results": [
+    {
+      "eval_id": "EVAL-001",
+      "scenario_name": "SSH Brute Force Attack",
+      "alert_id": "1790761522.100002",
+      "rule_id": "5712",
+      "search_query": "sshd: SSH brute force attack detected (multiple failed logins) Password Guessing Credential Access syslog sshd authentication_failures",
+      "retrieved_chunk_count": 5,
+      "relevance_at_k": [
+        true,
+        true,
+        true,
+        true,
+        true
+      ],
+      "relevance_reasons": [
+        "MITRE Technique Match (T1110)",
+        "MITRE Technique Match (T1110)",
+        "MITRE Technique Match (T1110)",
+        "MITRE Technique Match (T1110)",
+        "MITRE Technique Match (T1110)"
+      ],
+      "precision_at_1": 1.0,
+      "precision_at_3": 1.0,
+      "precision_at_5": 1.0,
+      "recall_at_1": 1.0,
+      "recall_at_3": 1.0,
+      "recall_at_5": 1.0,
+      "reciprocal_rank": 1.0,
+      "bert_score": {
+        "precision": 0.8649,
+        "recall": 0.88,
+        "f1": 0.8724
+      }
+    },
+    {
+      "eval_id": "EVAL-002",
+      "scenario_name": "Suspicious Encoded PowerShell",
+      "alert_id": "1790761522.100014",
+      "rule_id": "91802",
+      "search_query": "Sysmon: Suspicious PowerShell process executed with base64 encoded command arguments PowerShell Execution windows sysmon process_creation",
+      "retrieved_chunk_count": 5,
+      "relevance_at_k": [
+        true,
+        true,
+        true,
+        true,
+        false
+      ],
+      "relevance_reasons": [
+        "Domain Keywords Match (execution, script)",
+        "Domain Keywords Match (execution, script)",
+        "Domain Keywords Match (execution, script)",
+        "Domain Keywords Match (execution, script)",
+        "Not relevant"
+      ],
+      "precision_at_1": 1.0,
+      "precision_at_3": 1.0,
+      "precision_at_5": 0.8,
+      "recall_at_1": 1.0,
+      "recall_at_3": 1.0,
+      "recall_at_5": 1.0,
+      "reciprocal_rank": 1.0,
+      "bert_score": {
+        "precision": 0.8008,
+        "recall": 0.8092,
+        "f1": 0.805
+      }
+    },
+    {
+      "eval_id": "EVAL-003",
+      "scenario_name": "Quarantined Trojan Malware",
+      "alert_id": "1790761522.100051",
+      "rule_id": "60185",
+      "search_query": "Windows Defender: Malware detected and quarantined (Trojan:Win32/Wacatac.B!ml) Malicious File Execution windows defender malware",
+      "retrieved_chunk_count": 5,
+      "relevance_at_k": [
+        false,
+        false,
+        false,
+        false,
+        false
+      ],
+      "relevance_reasons": [
+        "Not relevant",
+        "Not relevant",
+        "Not relevant",
+        "Not relevant",
+        "Not relevant"
+      ],
+      "precision_at_1": 0.0,
+      "precision_at_3": 0.0,
+      "precision_at_5": 0.0,
+      "recall_at_1": 0.0,
+      "recall_at_3": 0.0,
+      "recall_at_5": 0.0,
+      "reciprocal_rank": 0.0,
+      "bert_score": {
+        "precision": 0.7598,
+        "recall": 0.7736,
+        "f1": 0.7667
+      }
+    },
+    {
+      "eval_id": "EVAL-004",
+      "scenario_name": "Web Application SQL Injection",
+      "alert_id": "1790761522.100020",
+      "rule_id": "31101",
+      "search_query": "Apache: SQL injection keyword detected in HTTP GET parameters Exploit Public-Facing Application Initial Access web appsec sqli",
+      "retrieved_chunk_count": 5,
+      "relevance_at_k": [
+        true,
+        true,
+        true,
+        true,
+        true
+      ],
+      "relevance_reasons": [
+        "MITRE Technique Match (T1190)",
+        "MITRE Technique Match (T1190)",
+        "MITRE Technique Match (T1190)",
+        "MITRE Technique Match (T1190)",
+        "MITRE Technique Match (T1190)"
+      ],
+      "precision_at_1": 1.0,
+      "precision_at_3": 1.0,
+      "precision_at_5": 1.0,
+      "recall_at_1": 1.0,
+      "recall_at_3": 1.0,
+      "recall_at_5": 1.0,
+      "reciprocal_rank": 1.0,
+      "bert_score": {
+        "precision": 0.8177,
+        "recall": 0.8288,
+        "f1": 0.8232
+      }
+    },
+    {
+      "eval_id": "EVAL-005",
+      "scenario_name": "LSASS Memory Credential Dumping (Mimikatz)",
+      "alert_id": "1790761522.100032",
+      "rule_id": "91810",
+      "search_query": "Sysmon: Process accessed lsass.exe memory with suspicious dump permissions (Mimikatz detected) LSASS Memory Credential Access windows sysmon credential_access",
+      "retrieved_chunk_count": 5,
+      "relevance_at_k": [
+        false,
+        false,
+        false,
+        false,
+        false
+      ],
+      "relevance_reasons": [
+        "Not relevant",
+        "Not relevant",
+        "Not relevant",
+        "Not relevant",
+        "Not relevant"
+      ],
+      "precision_at_1": 0.0,
+      "precision_at_3": 0.0,
+      "precision_at_5": 0.0,
+      "recall_at_1": 0.0,
+      "recall_at_3": 0.0,
+      "recall_at_5": 0.0,
+      "reciprocal_rank": 0.0,
+      "bert_score": {
+        "precision": 0.7777,
+        "recall": 0.7824,
+        "f1": 0.78
+      }
+    }
+  ]
+}

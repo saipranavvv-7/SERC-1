@@ -1,0 +1,52 @@
+[
+  {
+    "eval_id": "EVAL-001",
+    "scenario_name": "SSH Brute Force Attack",
+    "alert_id": "1790761522.100002",
+    "rule_id": "5712",
+    "attack_type": "Brute Force",
+    "expected_mitre_techniques": ["T1110.001", "T1110"],
+    "expected_keywords": ["ssh", "brute force", "failed", "authentication", "root", "password guessing"],
+    "reference_analysis": "The alert indicates a high-severity SSH brute force attack against server-prod-01 originating from external IP 198.51.100.50. Wazuh detected 18 failed login attempts targeting the root account. This matches MITRE ATT&CK technique T1110.001 (Password Guessing) under Credential Access. Immediate response requires verifying if any subsequent authentication succeeded from this source IP, enforcing firewall or fail2ban rate limits to block IP 198.51.100.50, and confirming root SSH login is disabled in sshd_config."
+  },
+  {
+    "eval_id": "EVAL-002",
+    "scenario_name": "Suspicious Encoded PowerShell",
+    "alert_id": "1790761522.100014",
+    "rule_id": "91802",
+    "attack_type": "Suspicious PowerShell / Command Execution",
+    "expected_mitre_techniques": ["T1059.001", "T1059", "T1027"],
+    "expected_keywords": ["powershell", "encoded", "base64", "execution", "script", "command"],
+    "reference_analysis": "The alert flags a high-severity Sysmon detection of powershell.exe executed with base64 encoded arguments (-enc / -EncodedCommand) on endpoint ws-finance-04. This pattern aligns with MITRE ATT&CK technique T1059.001 and T1027, commonly employed by adversaries to bypass command-line inspection and download secondary payloads. The analyst should decode the base64 string, identify network connections initiated by the process, isolate the affected workstation, and inspect parent process lineage."
+  },
+  {
+    "eval_id": "EVAL-003",
+    "scenario_name": "Quarantined Trojan Malware",
+    "alert_id": "1790761522.100051",
+    "rule_id": "60185",
+    "attack_type": "Malware / Trojan Infection",
+    "expected_mitre_techniques": ["T1204.002", "T1204", "T1059"],
+    "expected_keywords": ["malware", "trojan", "quarantined", "wacatac", "defender", "virus"],
+    "reference_analysis": "Windows Defender detected and quarantined Trojan:Win32/Wacatac.B!ml executed from user temp directory on endpoint ws-sales-02. This corresponds to MITRE ATT&CK technique T1204.002 (Malicious File). While the antivirus neutralized the immediate binary, the analyst must determine the initial vector such as email attachment or browser download, inspect persistence mechanisms like scheduled tasks or registry run keys, and review proxy logs for command-and-control communications."
+  },
+  {
+    "eval_id": "EVAL-004",
+    "scenario_name": "Web Application SQL Injection",
+    "alert_id": "1790761522.100020",
+    "rule_id": "31101",
+    "attack_type": "SQL Injection",
+    "expected_mitre_techniques": ["T1190"],
+    "expected_keywords": ["sql injection", "union select", "apache", "http", "database", "web"],
+    "reference_analysis": "Wazuh intercepted an Apache HTTP access request containing SQL injection syntax (' UNION SELECT ... --) targeting a public-facing web server from IP 203.0.113.88. This matches MITRE ATT&CK technique T1190 (Exploit Public-Facing Application). The analyst should review database query logs to verify whether the backend database executed the query or returned HTTP 500/200 errors with leaked records, block the offending IP address at the WAF or perimeter firewall, and patch input validation in the application."
+  },
+  {
+    "eval_id": "EVAL-005",
+    "scenario_name": "LSASS Memory Credential Dumping (Mimikatz)",
+    "alert_id": "1790761522.100032",
+    "rule_id": "91810",
+    "attack_type": "Credential Access / LSASS Dumping",
+    "expected_mitre_techniques": ["T1003.001", "T1003"],
+    "expected_keywords": ["lsass", "credential dumping", "mimikatz", "memory", "sysmon", "privilege"],
+    "reference_analysis": "Sysmon detected an unauthorized process opening a handle with PROCESS_VM_READ and PROCESS_QUERY_INFORMATION rights to lsass.exe on domain controller DC-01, indicative of Mimikatz or credential theft. This maps to MITRE ATT&CK technique T1003.001 (OS Credential Dumping). Immediate containment involves isolating the affected host from the domain network, revoking and resetting compromised domain credentials and Kerberos krbtgt tickets, and auditing active domain logon sessions."
+  }
+]

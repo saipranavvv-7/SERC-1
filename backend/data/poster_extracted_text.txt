@@ -1,0 +1,100 @@
+=== PAGE 1 ===
+RESEARCH POSTER / AI-ASSISTED SECURITY OPERATIONS
+Wazuh Security Response Copilot
+SERC: retrieval-augmented guidance for incident response
+Ismail et al. | Sensors 2025, 25, 870 | Published 31 January 2025
+WHAT EXACTLY IS THIS WORK ABOUT?
+The Security Event Response Copilot (SERC) adds an AI assistant to Wazuh. It extracts the meaning of
+security alerts, retrieves relevant incident-response and cybersecurity guidance, and asks an LLM to produce
+tailored mitigation instructions that analysts can review and discuss in the dashboard.
+01 INPUTS
+WAZUH SECURITY EVENT
+A JSON alert collected from
+monitored endpoints.
+Useful fields
+• Alert description
+• Severity level
+• Event / log details
+• Compliance tags
+• MITRE ID, when present
+THREE KNOWLEDGE SETS
+1. Incident-response guides
+and playbooks
+2. NIST CSF 2.0
+3. MITRE ATT&CK tactics,
+techniques and mitigations
+PREPARE THE CORPUS
+Split long guides into
+coherent text chunks. Embed
+and store content in three
+Qdrant collections; preserve
+complete use-case
+documents where
+appropriate.
+02 METHODOLOGY
+1 REFINE THE ALERT
+Parse the Wazuh JSON log. A Pixtral-based
+extractor uses a one-shot prompt to
+summarize the issue and key metadata.
+Output: a structured, readable event summary
+2 ENCODE FOR RETRIEVAL
+Use BAAI/bge-large-en-v1.5 to represent text
+as vectors. Search Qdrant for semantically
+similar guidance.
+Similarity measure: cosine similarity
+3 ADD SECURITY CONTEXT
+Retrieve incident-response, NIST and MITRE
+context. When a MITRE ID is available, use it
+for a direct MITRE lookup.
+Combine retrieved guidance with event details
+4 GENERATE RESPONSE GUIDANCE
+A prompt builder combines the alert and retrieved
+context. The LLM produces tailored instructions.
+Compared models: GPT-4o and Pixtral 12B.
+03 OUTPUTS
+INCIDENT-RESPONSE
+INSTRUCTION GUIDE
+Context-specific actions to
+investigate the event and
+mitigate the identified risk,
+presented in Markdown.
+FRAMEWORK CONTEXT
+Relevant MITRE tactics and
+techniques, with guidance
+informed by incident-response
+references and NIST CSF 2.0.
+WAZUH COPILOT TAB
+Recommendations appear
+inside the dashboard.
+Follow-up chat supports
+clarifications about the
+incident.
+PRACTICAL PURPOSE
+Help SOC analysts interpret
+alerts and decide how to
+respond.
+04 EVIDENCE FROM THE PAPER
+12 simulated attack scenarios | Recommendations compared with SOCFortress reference playbooks
+Model
+BERTScore F1 range
+Peak cosine similarity
+Pixtral 12B
+85.4-87.2%
+71.69%
+GPT-4o (OpenAI)
+84.9-86.5%
+75.81%
+Atomic Red Team generated endpoint activity; Wazuh collected the resulting alerts.
+These are response-text similarity scores, not attack-detection accuracy or verified mitigation success.
+05 APPLICATION AREAS
+SOC incident handling: contextual guidance for alerts.
+Analyst assistance: explanations and follow-up chat.
+Security exercises: review responses to account compromise,
+malware, phishing and ransomware scenarios.
+RESEARCH INTERPRETATION
+The contribution connects Wazuh alerts to retrieved response
+knowledge. Text similarity does not verify that advice is correct or safe
+to execute. The study does not establish response-time savings or field
+effectiveness; SOAR automation and fine-tuning are future work.
+Source: Ismail et al., “Enhancing Security Operations Center: Wazuh Security Event Response with Retrieval-Augmented-Generation-Driven Copilot,” Sensors 25 (2025), 870.
+DOI: 10.3390/s25030870 | Sections 3-5; Figures 9-12. Model names and numerical ranges follow the paper. Results are author-reported, not independently reproduced.

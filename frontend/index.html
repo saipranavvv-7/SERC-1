@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" href="data:,">
+  <title>SERC — Security Event Response Copilot</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <span class="logo">SERC</span>
+      <div>
+        <h1>Security Event Response Copilot</h1>
+        <p>Understand a Wazuh alert, see the evidence behind every suggestion, and decide what to do.</p>
+      </div>
+    </div>
+    <div class="topbar-right">
+      <label class="switch" title="Show scores, IDs and other technical details">
+        <input type="checkbox" id="tech-toggle"> <span>Technical details</span>
+      </label>
+      <span id="pill-backend" class="pill">Connecting…</span>
+      <span id="pill-corpus" class="pill hidden"></span>
+      <span id="pill-mode" class="pill hidden"></span>
+    </div>
+  </header>
+
+  <div id="banner" class="banner hidden" role="alert"></div>
+
+  <nav class="stepper" aria-label="Progress">
+    <ol id="stepper">
+      <li data-step="1" class="active"><span>1</span> Add an alert</li>
+      <li data-step="2"><span>2</span> Check the details</li>
+      <li data-step="3"><span>3</span> Review and verify</li>
+    </ol>
+  </nav>
+
+  <main class="container">
+    <!-- STEP 1 -->
+    <section id="panel-input" class="card">
+      <h2>Add a security alert</h2>
+      <p class="muted">Paste it, upload a file or screenshot, or try a sample. SERC accepts Wazuh alert JSON, plain log lines, <code>.log</code> / <code>.txt</code> / <code>.csv</code> files and images.</p>
+
+      <div class="tablist" role="tablist" id="input-tabs">
+        <button role="tab" class="tab active" data-tab="paste" aria-selected="true">Paste text</button>
+        <button role="tab" class="tab" data-tab="upload" aria-selected="false">Upload file or image</button>
+        <button role="tab" class="tab" data-tab="sample" aria-selected="false">Try a sample</button>
+      </div>
+
+      <div id="itab-paste" class="itab">
+        <label for="paste-text" class="sr-only">Alert text</label>
+        <textarea id="paste-text" rows="9" spellcheck="false"
+          placeholder="Paste a Wazuh alert (JSON) or a raw log line, for example:&#10;Sep 30 10:35:21 server-prod-01 sshd[18422]: Failed password for invalid user admin from 198.51.100.50 port 54321 ssh2"></textarea>
+        <div class="actions"><button class="btn primary" id="btn-paste">Continue</button></div>
+      </div>
+
+      <div id="itab-upload" class="itab hidden">
+        <div id="dropzone" class="dropzone" tabindex="0" role="button" aria-label="Choose a file or drop it here">
+          <div class="dz-icon" aria-hidden="true">⬆</div>
+          <strong>Drop a file here, or click to choose</strong>
+          <span class="muted">JSON, log, text, CSV (up to 2 MB) or PNG / JPG screenshot (up to 5 MB)</span>
+          <span id="file-name" class="file-name hidden"></span>
+        </div>
+        <input type="file" id="file-input" class="hidden" accept=".json,.log,.txt,.csv,.ndjson,.jsonl,.png,.jpg,.jpeg,.webp">
+        <p id="vision-note" class="note hidden"></p>
+        <div class="actions"><button class="btn primary" id="btn-upload" disabled>Continue</button></div>
+      </div>
+
+      <div id="itab-sample" class="itab hidden">
+        <label for="sample-select" class="muted">Choose one of the built-in example alerts (synthetic, made for testing):</label>
+        <select id="sample-select"></select>
+        <div class="actions"><button class="btn primary" id="btn-sample">Load sample</button></div>
+      </div>
+
+      <p id="input-error" class="error hidden" role="alert"></p>
+    </section>
+
+    <!-- STEP 2 -->
+    <section id="panel-confirm" class="card hidden">
+      <h2>Check the details</h2>
+      <p id="confirm-intro" class="muted"></p>
+      <ul id="confirm-warnings" class="notice-list"></ul>
+      <div class="form-grid">
+        <label>What happened <input id="f-desc" type="text"></label>
+        <label>Severity level (0–15) <input id="f-level" type="number" min="0" max="15" placeholder="unknown"></label>
+        <label>Host / agent <input id="f-agent" type="text"></label>
+        <label>Source IP <input id="f-ip" type="text"></label>
+        <label>User <input id="f-user" type="text"></label>
+        <div class="field"><span class="label">MITRE ATT&amp;CK technique</span><div id="f-mitre" class="chips"></div></div>
+      </div>
+      <label class="block">Log text <textarea id="f-log" rows="4" spellcheck="false"></textarea></label>
+      <details class="tech"><summary>Raw alert JSON</summary><pre id="f-raw"></pre></details>
+      <div class="actions">
+        <button class="btn" id="btn-back">Back</button>
+        <button class="btn primary" id="btn-analyze">Analyze this alert</button>
+      </div>
+      <p id="confirm-error" class="error hidden" role="alert"></p>
+    </section>
+
+    <!-- loading -->
+    <section id="panel-loading" class="card hidden" aria-live="polite">
+      <div class="spinner" aria-hidden="true"></div>
+      <h2>Analyzing…</h2>
+      <ol id="loading-steps" class="loading-steps">
+        <li>Reading the alert</li>
+        <li>Searching MITRE ATT&amp;CK, NIST CSF and incident-response guides</li>
+        <li>Checking every statement against the evidence</li>
+      </ol>
+      <p id="loading-slow" class="muted hidden">The first analysis can take up to a minute while the search model loads.</p>
+    </section>
+
+    <!-- STEP 3 -->
+    <section id="panel-results" class="hidden">
+      <div id="summary"></div>
+      <div class="card tabs-card">
+        <div class="tablist" role="tablist" id="result-tabs"></div>
+        <div id="tab-report" class="tabpanel"></div>
+        <div id="tab-mitre" class="tabpanel hidden"></div>
+        <div id="tab-evidence" class="tabpanel hidden"></div>
+        <div id="tab-verify" class="tabpanel hidden"></div>
+        <div id="tab-chat" class="tabpanel hidden"></div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    SERC is decision support, not an automatic responder. It never changes systems, and a person approves every action.
+    Evidence comes from MITRE ATT&amp;CK, NIST CSF 2.0, CERT-SG IRM playbooks and NIST SP 800-61.
+  </footer>
+  <script src="script.js"></script>
+</body>
+</html>
